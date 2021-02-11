@@ -121,6 +121,16 @@ data:
         return $return_value
     }
 
+    ## Removing member from the cluster
+    remove_member_from_cluster() {
+        if etcdctl $AUTH_OPTIONS member list | grep -qw "$HOSTNAME"; then
+            echo "==> Removing member $HOSTNAME from the cluster..."
+            etcdctl $AUTH_OPTIONS member remove --debug=true "$(cat "$ETCD_DATA_DIR/member_id")" > "$(dirname "$ETCD_DATA_DIR")/member_removal.log"
+        fi
+    }
+
+    remove_member_from_cluster 1>&3 2>&4
+
     if [[ ! -d "$ETCD_DATA_DIR" ]]; then
         echo "==> Creating data dir..." 1>&3 2>&4
         echo "==> There is no data at all. Initializing a new member of the cluster..." 1>&3 2>&4
